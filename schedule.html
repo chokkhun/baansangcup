@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>ตารางการแข่งขัน — บ้านสร้างคัพ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700;800&family=Sarabun:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#05070f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="บ้านสร้างคัพ">
+<link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="assets/img/favicon-32.png">
+<link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container site-header__inner">
+    <a href="index.html" class="brand">
+      <span class="brand__mark">🏆</span>
+      <span class="brand__text">บ้านสร้างคัพ<small>ครั้งที่ 1 · การแข่งขันฟุตซอลการกุศล</small></span>
+    </a>
+    <button class="nav-toggle" aria-label="เปิดเมนู">☰</button>
+    <nav class="site-nav">
+      <a href="index.html">หน้าแรก</a>
+      <a href="schedule.html" aria-current="page">ตารางการแข่งขัน</a>
+      <a href="draw.html">จับฉลากแบ่งสาย</a>
+      <a href="rules.html">กฎกติกา</a>
+      <a href="news.html">ข่าวสาร</a>
+    </nav>
+  </div>
+</header>
+
+<section class="page-hero">
+  <div class="container">
+    <h1>ตารางการแข่งขัน &amp; ผลการแข่งขัน</h1>
+    <p>ติดตามโปรแกรมการแข่งขันและผลสดของทุกคู่ในทัวร์นาเมนต์ บ้านสร้างคัพ ครั้งที่ 1</p>
+  </div>
+</section>
+
+<main class="page-section">
+  <div class="container">
+    <div class="filters">
+      <select id="f-division">
+        <option value="">ทุกรุ่นอายุ</option>
+        <option value="U12">รุ่นไม่เกิน 12 ปี</option>
+        <option value="U14">รุ่นไม่เกิน 14 ปี</option>
+      </select>
+      <select id="f-group">
+        <option value="">ทุกสาย</option>
+      </select>
+      <select id="f-status">
+        <option value="">ทุกสถานะ</option>
+        <option value="upcoming">เตรียมแข่ง</option>
+        <option value="live">กำลังแข่ง</option>
+        <option value="finished">จบแล้ว</option>
+      </select>
+    </div>
+    <div class="grid grid-3" id="matches-grid">
+      <div class="loading-row">กำลังโหลดข้อมูล…</div>
+    </div>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <div>
+      <h4>บ้านสร้างคัพ ครั้งที่ 1</h4>
+      <p data-setting="banner_tagline">รายได้ทั้งหมดหักค่าใช้จ่ายแล้ว นำไปซ่อมแซมสนามฟุตซอลให้กับเด็กในชุมชนวัดบ้านสร้าง</p>
+    </div>
+    <div>
+      <h4>เมนู</h4>
+      <ul>
+        <li><a href="schedule.html">ตารางการแข่งขัน</a></li>
+        <li><a href="draw.html">จับฉลากแบ่งสาย</a></li>
+        <li><a href="rules.html">กฎกติกา</a></li>
+        <li><a href="news.html">ข่าวสาร</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>ติดต่อสมัครทีม</h4>
+      <ul>
+        <li>📞 <span data-setting="contact1_name">คุณโชค</span> <span data-setting="contact1_phone">098-665-3916</span></li>
+        <li>📞 <span data-setting="contact2_name">คุณเบญ</span> <span data-setting="contact2_phone">065-636-2988</span></li>
+      </ul>
+    </div>
+  </div>
+  <div class="container footer-bottom">© 2569 บ้านสร้างคัพ — จัดโดยชุมชนวัดบ้านสร้าง</div>
+</footer>
+
+<nav class="bottom-nav" aria-label="เมนูหลัก (มือถือ)">
+  <div class="bottom-nav__inner">
+      <a href="index.html"><span class="icon">🏠</span>หน้าแรก</a>
+      <a href="schedule.html" aria-current="page"><span class="icon">📅</span>ตาราง</a>
+      <a href="draw.html"><span class="icon">🎯</span>แบ่งสาย</a>
+      <a href="rules.html"><span class="icon">📋</span>กติกา</a>
+      <a href="news.html"><span class="icon">📰</span>ข่าว</a>
+  </div>
+</nav>
+
+<script src="assets/js/config.js"></script>
+<script src="assets/js/sheets.js"></script>
+<script src="assets/js/app.js"></script>
+<script>
+  (async function () {
+    const [settings, matches] = await Promise.all([FutsalData.getSettings(), FutsalData.getMatches()]);
+    applySettings(settings);
+
+    const groupSelect = document.getElementById("f-group");
+    const state = { division: "", group: "", status: "" };
+
+    function refreshGroupOptions() {
+      const groups = [...new Set(
+        matches.filter((m) => !state.division || m.division === state.division).map((m) => m.group)
+      )].filter(Boolean).sort();
+      groupSelect.innerHTML = `<option value="">ทุกสาย</option>` +
+        groups.map((g) => `<option value="${g}">สาย ${g}</option>`).join("");
+    }
+
+    function render() {
+      const filtered = matches
+        .filter((m) => !state.division || m.division === state.division)
+        .filter((m) => !state.group || m.group === state.group)
+        .filter((m) => !state.status || m.status === state.status)
+        .sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
+
+      document.getElementById("matches-grid").innerHTML = filtered.length
+        ? filtered.map(matchCard).join("")
+        : `<p class="loading-row">ไม่พบแมตช์ตามเงื่อนไขที่เลือก</p>`;
+    }
+
+    document.getElementById("f-division").addEventListener("change", (e) => {
+      state.division = e.target.value;
+      refreshGroupOptions();
+      state.group = "";
+      render();
+    });
+    groupSelect.addEventListener("change", (e) => { state.group = e.target.value; render(); });
+    document.getElementById("f-status").addEventListener("change", (e) => { state.status = e.target.value; render(); });
+
+    refreshGroupOptions();
+    render();
+  })();
+</script>
+</body>
+</html>
