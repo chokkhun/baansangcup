@@ -21,6 +21,13 @@ const SHEET_TABS = {
 };
 
 /* =========================================================
+   หน้าแอดมิน (admin.html) — ต้องมี URL นี้ถึงจะแก้ไขข้อมูลผ่านหน้าเว็บได้
+   วิธีได้มา: ดูขั้นตอนใน apps-script/Code.gs และ README.md หัวข้อ
+   "เปิดใช้งานหน้าแอดมิน"
+   ตัวอย่างรูปแบบ: https://script.google.com/macros/s/AKfycbxxxxxxxxxx/exec
+   ========================================================= */
+const ADMIN_API_URL = ""; // https://script.google.com/macros/s/AKfycbyCZAAftycS-ISsr26jNAE58ZPd9XoDSLxwyvPQuvVdSjevP2SI50eLJToNSTEwu2Lu/exec
+/* =========================================================
    ข้อมูลตัวอย่าง (SAMPLE DATA)
    ใช้แสดงผลทันทีก่อนเชื่อม Google Sheet จริง และใช้เป็น "แผนสำรอง"
    หากดึงข้อมูลจากชีตไม่สำเร็จ (เช่น ยังไม่ได้ตั้งค่า SHEET_ID)
