@@ -2,10 +2,17 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>ตารางการแข่งขัน — บ้านสร้างคัพ</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700;800&family=Sarabun:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#05070f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="บ้านสร้างคัพ">
+<link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="assets/img/favicon-32.png">
 <link rel="stylesheet" href="assets/css/style.css" />
 </head>
 <body>
@@ -83,6 +90,16 @@
   </div>
   <div class="container footer-bottom">© 2569 บ้านสร้างคัพ — จัดโดยชุมชนวัดบ้านสร้าง</div>
 </footer>
+
+<nav class="bottom-nav" aria-label="เมนูหลัก (มือถือ)">
+  <div class="bottom-nav__inner">
+      <a href="index.html"><span class="icon">🏠</span>หน้าแรก</a>
+      <a href="schedule.html" aria-current="page"><span class="icon">📅</span>ตาราง</a>
+      <a href="draw.html"><span class="icon">🎯</span>แบ่งสาย</a>
+      <a href="rules.html"><span class="icon">📋</span>กติกา</a>
+      <a href="news.html"><span class="icon">📰</span>ข่าว</a>
+  </div>
+</nav>
 
 <script src="assets/js/config.js"></script>
 <script src="assets/js/sheets.js"></script>
