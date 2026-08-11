@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>จับฉลากแบ่งสาย — บ้านสร้างคัพ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700;800&family=Sarabun:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container site-header__inner">
+    <a href="index.html" class="brand">
+      <span class="brand__mark">🏆</span>
+      <span class="brand__text">บ้านสร้างคัพ<small>ครั้งที่ 1 · การแข่งขันฟุตซอลการกุศล</small></span>
+    </a>
+    <button class="nav-toggle" aria-label="เปิดเมนู">☰</button>
+    <nav class="site-nav">
+      <a href="index.html">หน้าแรก</a>
+      <a href="schedule.html">ตารางการแข่งขัน</a>
+      <a href="draw.html" aria-current="page">จับฉลากแบ่งสาย</a>
+      <a href="rules.html">กฎกติกา</a>
+      <a href="news.html">ข่าวสาร</a>
+    </nav>
+  </div>
+</header>
+
+<section class="page-hero">
+  <div class="container">
+    <h1>ผลการจับฉลากแบ่งสาย</h1>
+    <p>รายชื่อทีมที่เข้าร่วมแต่ละสาย พร้อมตารางคะแนนที่อัปเดตอัตโนมัติจากผลการแข่งขัน</p>
+  </div>
+</section>
+
+<main class="page-section">
+  <div class="container">
+    <div class="division-tabs" id="draw-tabs" role="tablist">
+      <button data-division="U12" class="is-active">รุ่นไม่เกิน 12 ปี</button>
+      <button data-division="U14">รุ่นไม่เกิน 14 ปี</button>
+    </div>
+
+    <div class="section-eyebrow" style="margin-bottom:10px">รายชื่อทีมตามสาย</div>
+    <div class="grid grid-3" id="groups-grid" style="margin-bottom:48px">
+      <div class="loading-row">กำลังโหลดข้อมูล…</div>
+    </div>
+
+    <div class="section-eyebrow" style="margin-bottom:10px">ตารางคะแนนแยกตามสาย</div>
+    <div id="standings-all"></div>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <div>
+      <h4>บ้านสร้างคัพ ครั้งที่ 1</h4>
+      <p data-setting="banner_tagline">รายได้ทั้งหมดหักค่าใช้จ่ายแล้ว นำไปซ่อมแซมสนามฟุตซอลให้กับเด็กในชุมชนวัดบ้านสร้าง</p>
+    </div>
+    <div>
+      <h4>เมนู</h4>
+      <ul>
+        <li><a href="schedule.html">ตารางการแข่งขัน</a></li>
+        <li><a href="draw.html">จับฉลากแบ่งสาย</a></li>
+        <li><a href="rules.html">กฎกติกา</a></li>
+        <li><a href="news.html">ข่าวสาร</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>ติดต่อสมัครทีม</h4>
+      <ul>
+        <li>📞 <span data-setting="contact1_name">คุณโชค</span> <span data-setting="contact1_phone">098-665-3916</span></li>
+        <li>📞 <span data-setting="contact2_name">คุณเบญ</span> <span data-setting="contact2_phone">065-636-2988</span></li>
+      </ul>
+    </div>
+  </div>
+  <div class="container footer-bottom">© 2569 บ้านสร้างคัพ — จัดโดยชุมชนวัดบ้านสร้าง</div>
+</footer>
+
+<script src="assets/js/config.js"></script>
+<script src="assets/js/sheets.js"></script>
+<script src="assets/js/app.js"></script>
+<script>
+  (async function () {
+    const [settings, teams, matches] = await Promise.all([
+      FutsalData.getSettings(), FutsalData.getTeams(), FutsalData.getMatches()
+    ]);
+    applySettings(settings);
+
+    function render(division) {
+      const divTeams = teams.filter((t) => t.division === division);
+      const byGroup = groupBy(divTeams, (t) => t.group);
+      const groupNames = Object.keys(byGroup).sort();
+
+      document.getElementById("groups-grid").innerHTML = groupNames.map((g) => `
+        <div class="group-card">
+          <h3>สาย ${g}</h3>
+          <ol>${byGroup[g].map((t) => `<li>${t.name}</li>`).join("")}</ol>
+        </div>
+      `).join("") || `<p class="loading-row">ยังไม่มีข้อมูลทีมในรุ่นนี้</p>`;
+
+      document.getElementById("standings-all").innerHTML = groupNames.map((g) => `
+        <div style="margin-bottom:26px">
+          <h3 style="font-size:15px;color:var(--ink-300);margin-bottom:10px">สาย ${g}</h3>
+          ${standingsTable(buildStandings(teams, matches, division, g))}
+        </div>
+      `).join("");
+    }
+
+    render("U12");
+
+    document.querySelectorAll("#draw-tabs button").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll("#draw-tabs button").forEach((b) => b.classList.remove("is-active"));
+        btn.classList.add("is-active");
+        render(btn.dataset.division);
+      });
+    });
+  })();
+</script>
+</body>
+</html>
