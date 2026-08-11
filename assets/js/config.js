@@ -26,7 +26,7 @@ const SHEET_TABS = {
    "เปิดใช้งานหน้าแอดมิน"
    ตัวอย่างรูปแบบ: https://script.google.com/macros/s/AKfycbxxxxxxxxxx/exec
    ========================================================= */
-const ADMIN_API_URL = ""; // https://script.google.com/macros/s/AKfycbyCZAAftycS-ISsr26jNAE58ZPd9XoDSLxwyvPQuvVdSjevP2SI50eLJToNSTEwu2Lu/exec
+const ADMIN_API_URL = "https://script.google.com/macros/s/AKfycbyCZAAftycS-ISsr26jNAE58ZPd9XoDSLxwyvPQuvVdSjevP2SI50eLJToNSTEwu2Lu/exec"
 /* =========================================================
    ข้อมูลตัวอย่าง (SAMPLE DATA)
    ใช้แสดงผลทันทีก่อนเชื่อม Google Sheet จริง และใช้เป็น "แผนสำรอง"
