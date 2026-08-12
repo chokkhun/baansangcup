@@ -101,8 +101,7 @@ const FutsalData = (() => {
   async function getTeams() {
     try {
       const rows = await fetchSheet(SHEET_TABS.teams);
-      if (!rows.length) throw new Error("empty");
-      return rows;
+      return rows; // แม้ผลลัพธ์จะว่างเปล่า (ลบข้อมูลหมดแล้ว) ก็ถือเป็นค่าจริง ไม่ใช่ error
     } catch (e) {
       return SAMPLE_DATA.teams;
     }
@@ -111,7 +110,6 @@ const FutsalData = (() => {
   async function getMatches() {
     try {
       const rows = await fetchSheet(SHEET_TABS.matches);
-      if (!rows.length) throw new Error("empty");
       return rows;
     } catch (e) {
       return SAMPLE_DATA.matches;
@@ -121,7 +119,6 @@ const FutsalData = (() => {
   async function getNews() {
     try {
       const rows = await fetchSheet(SHEET_TABS.news);
-      if (!rows.length) throw new Error("empty");
       return rows.sort((a, b) => (a.date < b.date ? 1 : -1));
     } catch (e) {
       return SAMPLE_DATA.news;
