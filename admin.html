@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>ระบบแอดมิน — บ้านสร้างคัพ</title>
+<meta name="robots" content="noindex, nofollow" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700;800&family=Sarabun:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#05070f">
+<link rel="icon" type="image/png" href="assets/img/favicon-32.png">
+<link rel="stylesheet" href="assets/css/style.css" />
+<link rel="stylesheet" href="assets/css/admin.css" />
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container site-header__inner">
+    <a href="index.html" class="brand">
+      <span class="brand__mark">🏆</span>
+      <span class="brand__text">บ้านสร้างคัพ<small>ระบบแอดมิน</small></span>
+    </a>
+    <a href="index.html" class="btn btn-ghost" style="font-size:13px;padding:8px 16px">← กลับหน้าเว็บ</a>
+  </div>
+</header>
+
+<!-- หน้าจอกรอกรหัสผ่าน -->
+<section id="login-screen" class="page-section">
+  <div class="container" style="max-width:420px">
+    <div class="admin-card">
+      <h1 style="font-size:22px;margin-bottom:6px">เข้าสู่ระบบแอดมิน</h1>
+      <p style="color:var(--ink-500);font-size:14px;margin-bottom:18px">กรอกรหัสผ่านที่ตั้งไว้ใน Apps Script (ADMIN_PASSWORD)</p>
+      <input type="password" id="pw-input" placeholder="รหัสผ่าน" class="admin-input" />
+      <button id="pw-submit" class="btn btn-primary" style="width:100%;justify-content:center;margin-top:12px">เข้าสู่ระบบ</button>
+      <p id="pw-error" style="color:var(--red-400);font-size:13px;margin-top:10px;display:none"></p>
+      <p id="pw-config-warning" style="color:var(--gold-400);font-size:13px;margin-top:14px;display:none">
+        ⚠️ ยังไม่ได้ตั้งค่า ADMIN_API_URL ใน assets/js/config.js — ดูวิธีตั้งค่าใน README.md หัวข้อ "เปิดใช้งานหน้าแอดมิน"
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- แผงควบคุมแอดมิน -->
+<section id="admin-panel" class="page-section" style="display:none">
+  <div class="container">
+    <div class="section-head">
+      <h1 style="font-size:24px">แผงควบคุมแอดมิน</h1>
+      <button id="logout-btn" class="btn btn-ghost" style="font-size:13px">ออกจากระบบ</button>
+    </div>
+
+    <div class="division-tabs" id="admin-tabs">
+      <button data-tab="matches" class="is-active">ผล/ตารางแข่ง</button>
+      <button data-tab="settings">ตั้งค่าเว็บ</button>
+      <button data-tab="teams">ทีม</button>
+      <button data-tab="news">ข่าวสาร</button>
+    </div>
+
+    <div id="admin-status" class="admin-status" style="display:none"></div>
+
+    <!-- ===== ผลการแข่งขัน / ตาราง ===== -->
+    <div class="admin-tab-panel" data-panel="matches">
+      <div class="admin-card" style="margin-bottom:20px">
+        <h3>เพิ่มแมตช์ใหม่</h3>
+        <form id="match-add-form" class="admin-form-grid"></form>
+      </div>
+      <div id="matches-list"></div>
+    </div>
+
+    <!-- ===== ตั้งค่าเว็บ ===== -->
+    <div class="admin-tab-panel" data-panel="settings" style="display:none">
+      <div class="admin-card">
+        <h3>ข้อความ &amp; ตั้งค่าทั่วเว็บ</h3>
+        <p style="color:var(--ink-500);font-size:13px;margin-bottom:14px">แก้แล้วกด "บันทึกการตั้งค่า" ด้านล่างครั้งเดียว จะอัปเดตทุกช่องพร้อมกัน</p>
+        <div id="settings-form" class="admin-form-grid"></div>
+        <button id="settings-save" class="btn btn-primary" style="margin-top:16px">บันทึกการตั้งค่า</button>
+      </div>
+    </div>
+
+    <!-- ===== ทีม ===== -->
+    <div class="admin-tab-panel" data-panel="teams" style="display:none">
+      <div class="admin-card" style="margin-bottom:20px">
+        <h3>เพิ่มทีมใหม่</h3>
+        <form id="team-add-form" class="admin-form-grid"></form>
+      </div>
+      <div id="teams-list"></div>
+    </div>
+
+    <!-- ===== ข่าวสาร ===== -->
+    <div class="admin-tab-panel" data-panel="news" style="display:none">
+      <div class="admin-card" style="margin-bottom:20px">
+        <h3>เพิ่มข่าวใหม่</h3>
+        <form id="news-add-form" class="admin-form-grid"></form>
+      </div>
+      <div id="news-list"></div>
+    </div>
+
+  </div>
+</section>
+
+<script src="assets/js/config.js"></script>
+<script src="assets/js/sheets.js"></script>
+<script src="assets/js/app.js"></script>
+<script src="assets/js/admin-api.js"></script>
+<script src="assets/js/admin.js"></script>
+</body>
+</html>
