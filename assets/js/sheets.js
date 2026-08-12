@@ -59,6 +59,18 @@ const FutsalData = (() => {
   }
 
   async function fetchSheet(sheetName) {
+    // ถ้าตั้งค่าระบบแอดมินไว้แล้ว ใช้ Apps Script อ่านข้อมูลแทน gviz เพราะ gviz มีแคช
+    // ฝั่ง Google เองที่บางครั้งค้างข้อมูลเก่าอยู่หลายนาที ส่วน Apps Script อ่านสดทุกครั้ง
+    if (ADMIN_API_URL) {
+      const url = `${ADMIN_API_URL}?sheet=${encodeURIComponent(sheetName)}&_=${Date.now()}`;
+      const res = await fetch(url, { cache: "no-store" });
+      if (!res.ok) throw new Error("fetch-failed");
+      const json = await res.json();
+      if (!json.ok) throw new Error(json.error || "fetch-failed");
+      return json.data;
+    }
+
+    // โหมดสำรอง (ยังไม่ได้ตั้งค่าระบบแอดมิน) — อ่านผ่าน gviz แบบเดิม
     if (!SHEET_ID) throw new Error("no-sheet-id");
     const res = await fetch(gvizUrl(sheetName), { cache: "no-store" });
     if (!res.ok) throw new Error("fetch-failed");
