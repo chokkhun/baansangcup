@@ -130,6 +130,10 @@ const MATCH_FIELDS = [
   ["score_home", "สกอร์เหย้า", "text"],
   ["score_away", "สกอร์เยือน", "text"],
   ["status", "สถานะ", "select", ["upcoming", "live", "finished"]],
+  ["yellow_home", "🟨 ใบเหลือง (เหย้า)", "text"],
+  ["red_home", "🟥 ใบแดง (เหย้า)", "text"],
+  ["yellow_away", "🟨 ใบเหลือง (เยือน)", "text"],
+  ["red_away", "🟥 ใบแดง (เยือน)", "text"],
 ];
 
 function fieldHtml(field, value, idPrefix) {
@@ -297,8 +301,36 @@ const NEWS_FIELDS = [
   ["title", "หัวข้อข่าว", "text"],
   ["excerpt", "สรุปย่อ", "text"],
   ["content", "เนื้อหาเต็ม", "textarea"],
-  ["image_url", "ลิงก์รูปภาพ (ถ้ามี)", "text"],
+  ["image_url", "รูปข่าว", "image"],
 ];
+
+/* ย่อขนาดรูปในเครื่อง (ฝั่งเบราว์เซอร์) ก่อนอัปโหลด กันไฟล์ใหญ่เกินไป/อัปช้า */
+function resizeImageFile(file, maxDim = 1600, quality = 0.85) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const reader = new FileReader();
+    reader.onload = () => {
+      img.onload = () => {
+        let { width, height } = img;
+        if (width > maxDim || height > maxDim) {
+          const scale = maxDim / Math.max(width, height);
+          width = Math.round(width * scale);
+          height = Math.round(height * scale);
+        }
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        canvas.getContext("2d").drawImage(img, 0, 0, width, height);
+        const dataUrl = canvas.toDataURL("image/jpeg", quality);
+        resolve(dataUrl.split(",")[1]); // ตัดส่วน "data:image/jpeg;base64," ออก เหลือแค่ base64
+      };
+      img.onerror = reject;
+      img.src = reader.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
 
 function newsFieldHtml(field, value, idPrefix) {
   const [key, label, type] = field;
@@ -307,8 +339,47 @@ function newsFieldHtml(field, value, idPrefix) {
     return `<div class="field field-wide"><label for="${id}">${label}</label>
       <textarea id="${id}" data-key="${key}" rows="3">${value ?? ""}</textarea></div>`;
   }
+  if (type === "image") {
+    return `<div class="field field-wide">
+      <label for="${id}">${label}</label>
+      <input id="${id}" data-key="${key}" value="${escapeAttr(value ?? "")}" placeholder="วางลิงก์รูป หรืออัปโหลดไฟล์ด้านล่าง" />
+      <div class="admin-image-upload">
+        <input type="file" accept="image/*" id="${id}-file" class="admin-file-input" />
+        <span class="admin-upload-status" id="${id}-status"></span>
+      </div>
+      ${value ? `<img src="${escapeAttr(value)}" class="admin-image-preview" id="${id}-preview" />` : `<img class="admin-image-preview" id="${id}-preview" style="display:none" />`}
+    </div>`;
+  }
   return `<div class="field"><label for="${id}">${label}</label>
     <input id="${id}" data-key="${key}" value="${escapeAttr(value ?? "")}" /></div>`;
+}
+
+/* ผูก event ให้ input[type=file] ของรูปข่าว: เลือกไฟล์ -> ย่อขนาด -> อัปโหลดขึ้น Drive -> เติมลิงก์ */
+function wireImageUpload(idPrefix) {
+  const fileInput = document.getElementById(`${idPrefix}-image_url-file`);
+  const textInput = document.getElementById(`${idPrefix}-image_url`);
+  const status = document.getElementById(`${idPrefix}-image_url-status`);
+  const preview = document.getElementById(`${idPrefix}-image_url-preview`);
+  if (!fileInput) return;
+
+  fileInput.addEventListener("change", async () => {
+    const file = fileInput.files[0];
+    if (!file) return;
+    status.textContent = "กำลังอัปโหลด…";
+    status.style.color = "var(--ink-500)";
+    try {
+      const base64 = await resizeImageFile(file);
+      const result = await AdminAPI.uploadImage(base64, file.name, "image/jpeg");
+      textInput.value = result.url;
+      preview.src = result.url;
+      preview.style.display = "block";
+      status.textContent = "อัปโหลดสำเร็จ ✓";
+      status.style.color = "var(--blue-400)";
+    } catch (err) {
+      status.textContent = "อัปโหลดไม่สำเร็จ: " + err.message;
+      status.style.color = "var(--red-400)";
+    }
+  });
 }
 
 function renderAddNewsForm() {
@@ -316,6 +387,7 @@ function renderAddNewsForm() {
   form.innerHTML =
     NEWS_FIELDS.map((f) => newsFieldHtml(f, "", "new-news")).join("") +
     `<div class="field field-actions"><button type="submit" class="btn btn-primary">เพิ่มข่าว</button></div>`;
+  wireImageUpload("new-news");
   form.onsubmit = async (e) => {
     e.preventDefault();
     const data = {};
@@ -326,6 +398,7 @@ function renderAddNewsForm() {
       NEWS_CACHE = await FutsalData.getNews();
       renderNews();
       form.reset();
+      document.getElementById("new-news-image_url-preview").style.display = "none";
     } catch (err) {
       showStatus("เพิ่มข่าวไม่สำเร็จ: " + err.message, "error");
     }
@@ -355,6 +428,7 @@ function renderNews() {
 
   container.querySelectorAll(".admin-row").forEach((row) => {
     const id = row.dataset.id;
+    wireImageUpload(`news-${id}`);
     row.querySelector('[data-action="save"]').addEventListener("click", async () => {
       const data = { id };
       NEWS_FIELDS.forEach(([key]) => (data[key] = row.querySelector(`[data-key="${key}"]`).value));

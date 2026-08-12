@@ -43,5 +43,7 @@ const AdminAPI = (() => {
     deleteTeam: (id) => call("deleteTeam", { id }),
     upsertNews: (data) => call("upsertNews", { data }),
     deleteNews: (id) => call("deleteNews", { id }),
+    uploadImage: (base64, filename, mimeType) =>
+      call("uploadImage", { data: { base64, filename, mimeType } }),
   };
 })();

@@ -95,7 +95,7 @@
 
     document.getElementById("news-grid").innerHTML = news.map((n) => `
       <article class="news-card">
-        <div class="news-card__img">📰</div>
+        <div class="news-card__img" ${n.image_url ? `style="background-image:url('${n.image_url}');background-size:cover;background-position:center"` : ""}>${n.image_url ? "" : "📰"}</div>
         <div class="news-card__body">
           <div class="news-card__date">${formatThaiDate(n.date)}</div>
           <h3 class="news-card__title">${n.title}</h3>

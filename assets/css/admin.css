@@ -76,3 +76,27 @@
   display: block; font-size: 11px; color: var(--gold-400); margin-bottom: 4px;
   font-family: var(--font-display); word-break: break-all;
 }
+
+.admin-image-upload {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+}
+.admin-file-input {
+  width: auto;
+  font-size: 12px;
+  color: var(--ink-300);
+  padding: 6px 0;
+  background: none;
+  border: none;
+}
+.admin-upload-status { font-size: 12px; font-family: var(--font-display); }
+.admin-image-preview {
+  margin-top: 10px;
+  max-width: 220px;
+  max-height: 140px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+}

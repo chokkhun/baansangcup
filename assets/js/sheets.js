@@ -9,9 +9,11 @@ const FutsalData = (() => {
   function gvizUrl(sheetName) {
     // headers=0 ปิดการ "เดาหัวตาราง" อัตโนมัติของ Google ซึ่งบางครั้งเดาผิด
     // และทำให้แถวข้อมูลแรก ๆ หายไปอย่างเงียบ ๆ
+    // พารามิเตอร์ _= เป็นตัวกันแคชฝั่ง Google เอง (ไม่ใช่แคชเบราว์เซอร์) เพื่อให้ได้
+    // ข้อมูลล่าสุดเสมอ โดยเฉพาะหลังลบ/แก้ไขข้อมูลผ่านหน้าแอดมิน
     return `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(
       sheetName
-    )}&headers=0`;
+    )}&headers=0&_=${Date.now()}`;
   }
 
   // Google เดา "จำนวนหัวตาราง" และ "ชนิดข้อมูล" ของแต่ละคอลัมน์เองโดยอัตโนมัติ
@@ -25,6 +27,7 @@ const FutsalData = (() => {
     Matches: [
       "id", "division", "group", "round", "date", "time", "venue",
       "team_home", "team_away", "score_home", "score_away", "status",
+      "yellow_home", "red_home", "yellow_away", "red_away",
     ],
     News: ["id", "date", "title", "excerpt", "content", "image_url"],
   };

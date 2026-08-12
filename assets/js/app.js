@@ -48,6 +48,11 @@ function statusBadge(status) {
 /* ---------- การ์ดแมตช์ ---------- */
 function matchCard(m) {
   const hasScore = m.status !== "upcoming" && (m.score_home !== "" || m.score_away !== "");
+  const totalYellow = (parseInt(m.yellow_home, 10) || 0) + (parseInt(m.yellow_away, 10) || 0);
+  const totalRed = (parseInt(m.red_home, 10) || 0) + (parseInt(m.red_away, 10) || 0);
+  const cardsNote = totalYellow || totalRed
+    ? `<span>${totalYellow ? "🟨×" + totalYellow : ""} ${totalRed ? "🟥×" + totalRed : ""}</span>`
+    : "";
   return `
     <article class="match-card ${divisionClass(m.division)}">
       <div class="match-card__top">
@@ -64,6 +69,7 @@ function matchCard(m) {
         <span>📅 ${formatThaiDate(m.date)}</span>
         <span>⏱ ${m.time || "-"}</span>
         <span>📍 ${m.venue || "-"}</span>
+        ${cardsNote}
       </div>
     </article>`;
 }
@@ -93,7 +99,7 @@ function buildStandings(teams, matches, division, group) {
   teams
     .filter((t) => t.division === division && (!group || t.group === group))
     .forEach((t) => {
-      rows[t.name] = { name: t.name, p: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, pts: 0 };
+      rows[t.name] = { name: t.name, p: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, pts: 0, yellow: 0, red: 0 };
     });
 
   matches
@@ -108,8 +114,9 @@ function buildStandings(teams, matches, division, group) {
     .forEach((m) => {
       const hs = parseInt(m.score_home, 10);
       const as = parseInt(m.score_away, 10);
-      if (!rows[m.team_home]) rows[m.team_home] = { name: m.team_home, p: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, pts: 0 };
-      if (!rows[m.team_away]) rows[m.team_away] = { name: m.team_away, p: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, pts: 0 };
+      const emptyRow = () => ({ p: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, pts: 0, yellow: 0, red: 0 });
+      if (!rows[m.team_home]) rows[m.team_home] = { name: m.team_home, ...emptyRow() };
+      if (!rows[m.team_away]) rows[m.team_away] = { name: m.team_away, ...emptyRow() };
       const home = rows[m.team_home];
       const away = rows[m.team_away];
       home.p++; away.p++;
@@ -118,6 +125,10 @@ function buildStandings(teams, matches, division, group) {
       if (hs > as) { home.w++; home.pts += 3; away.l++; }
       else if (hs < as) { away.w++; away.pts += 3; home.l++; }
       else { home.d++; away.d++; home.pts++; away.pts++; }
+      home.yellow += parseInt(m.yellow_home, 10) || 0;
+      home.red += parseInt(m.red_home, 10) || 0;
+      away.yellow += parseInt(m.yellow_away, 10) || 0;
+      away.red += parseInt(m.red_away, 10) || 0;
     });
 
   return Object.values(rows).sort(
@@ -133,7 +144,7 @@ function standingsTable(rows) {
         <tr>
           <th class="col-team">ทีม</th>
           <th>แข่ง</th><th>ชนะ</th><th>เสมอ</th><th>แพ้</th>
-          <th>ได้</th><th>เสีย</th><th>คะแนน</th>
+          <th>ได้</th><th>เสีย</th><th>คะแนน</th><th>🟨</th><th>🟥</th>
         </tr>
       </thead>
       <tbody>
@@ -144,6 +155,7 @@ function standingsTable(rows) {
             <td class="col-team"><span class="rank">${i + 1}</span> ${r.name}</td>
             <td>${r.p}</td><td>${r.w}</td><td>${r.d}</td><td>${r.l}</td>
             <td>${r.gf}</td><td>${r.ga}</td><td class="pts">${r.pts}</td>
+            <td>${r.yellow || 0}</td><td>${r.red || 0}</td>
           </tr>`
           )
           .join("")}
