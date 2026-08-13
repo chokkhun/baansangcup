@@ -98,11 +98,11 @@
 
     document.getElementById("news-grid").innerHTML = news.map((n) => `
       <article class="news-card">
-        <div class="news-card__img" ${n.image_url ? `style="background-image:url('${n.image_url}');background-size:cover;background-position:center"` : ""}>${n.image_url ? "" : "📰"}</div>
+        ${newsImageHtml(n)}
         <div class="news-card__body">
           <div class="news-card__date">${formatThaiDate(n.date)}</div>
           <h3 class="news-card__title">${n.title}</h3>
-          <p class="news-card__excerpt">${n.content || n.excerpt || ""}</p>
+          <p class="news-card__excerpt">${nl2br(n.content || n.excerpt || "")}</p>
         </div>
       </article>
     `).join("") || `<p class="loading-row">ยังไม่มีข่าวสาร</p>`;

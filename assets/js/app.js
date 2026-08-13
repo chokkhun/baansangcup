@@ -38,6 +38,24 @@ function el(html) {
   return t.content.firstElementChild;
 }
 
+/* แปลงข้อความยาว (เช่น เนื้อหาข่าว) ให้คงการเว้นบรรทัดตามที่พิมพ์จริง
+   พร้อม escape อักขระ HTML กันเนื้อหาที่พิมพ์มาไปรบกวนโครงหน้าเว็บ */
+function escapeHtml(str) {
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+function nl2br(str) {
+  return escapeHtml(str).replace(/\r\n|\r|\n/g, "<br>");
+}
+
+/* การ์ดรูปข่าว — แสดงเฉพาะเมื่อมีรูปแนบมาจริง ไม่โชว์กรอบตัวอย่างว่าง ๆ */
+function newsImageHtml(n) {
+  if (!n.image_url) return "";
+  return `<div class="news-card__img" style="background-image:url('${n.image_url}');background-size:cover;background-position:center"></div>`;
+}
+
 /* ---------- ป้ายสถานะแมตช์ ---------- */
 function statusBadge(status) {
   if (status === "live") return `<span class="badge badge-live">กำลังแข่ง</span>`;
