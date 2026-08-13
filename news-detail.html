@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>ข่าวสารอัปเดต — บ้านสร้างคัพ</title>
+<title>ข่าวสาร — บ้านสร้างคัพ</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700;800&family=Sarabun:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="manifest" href="manifest.json">
@@ -35,17 +35,11 @@
   </div>
 </header>
 
-<section class="page-hero">
-  <div class="container">
-    <h1>ข่าวสารอัปเดต</h1>
-    <p>ความเคลื่อนไหว ประกาศ และอัปเดตต่าง ๆ ของการแข่งขันบ้านสร้างคัพ ครั้งที่ 1</p>
-  </div>
-</section>
-
 <main class="page-section">
-  <div class="container">
-    <div class="grid grid-3" id="news-grid">
-      <div class="loading-row">กำลังโหลดข้อมูล…</div>
+  <div class="container" style="max-width:720px">
+    <a href="news.html" class="btn btn-ghost" style="margin-bottom:22px;font-size:13px">← กลับไปหน้าข่าวสารทั้งหมด</a>
+    <div id="article-root">
+      <p class="loading-row">กำลังโหลดข่าว…</p>
     </div>
   </div>
 </main>
@@ -96,16 +90,29 @@
     const { settings, news } = await FutsalData.getAll();
     applySettings(settings);
 
-    document.getElementById("news-grid").innerHTML = news.map((n) => `
-      <a class="news-card" href="news-detail.html?id=${encodeURIComponent(n.id)}">
-        ${newsImageHtml(n)}
-        <div class="news-card__body">
-          <div class="news-card__date">${formatThaiDate(n.date)}</div>
-          <h3 class="news-card__title">${n.title}</h3>
-          <p class="news-card__excerpt">${nl2br(n.excerpt || (n.content || "").slice(0, 120))}</p>
-        </div>
-      </a>
-    `).join("") || `<p class="loading-row">ยังไม่มีข่าวสาร</p>`;
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get("id");
+    const article = news.find((n) => String(n.id) === String(id));
+    const root = document.getElementById("article-root");
+
+    if (!article) {
+      root.innerHTML = `
+        <div class="admin-card" style="padding:28px;text-align:center">
+          <p style="color:var(--ink-300);margin-bottom:14px">ไม่พบข่าวที่คุณต้องการ อาจถูกลบหรือลิงก์ไม่ถูกต้อง</p>
+          <a href="news.html" class="btn btn-primary">ดูข่าวทั้งหมด</a>
+        </div>`;
+      return;
+    }
+
+    document.title = article.title + " — บ้านสร้างคัพ";
+
+    root.innerHTML = `
+      <article>
+        ${article.image_url ? `<img src="${article.image_url}" alt="${article.title}" style="width:100%;max-height:420px;object-fit:cover;border-radius:var(--radius);margin-bottom:22px;border:1px solid var(--line)" />` : ""}
+        <div class="news-card__date" style="font-size:13px;margin-bottom:8px">${formatThaiDate(article.date)}</div>
+        <h1 style="font-size:clamp(24px,4vw,34px);margin-bottom:18px">${article.title}</h1>
+        <div style="color:var(--ink-300);font-size:16px;line-height:1.8">${nl2br(article.content || article.excerpt || "")}</div>
+      </article>`;
   })();
 </script>
 </body>

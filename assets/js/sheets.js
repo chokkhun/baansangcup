@@ -145,15 +145,54 @@ const FutsalData = (() => {
     }
   }
 
+  /* แคชผลลัพธ์ของ getAll() ไว้ในเบราว์เซอร์ชั่วคราว (sessionStorage) เพื่อให้การ
+     สลับไปมาระหว่างหน้าต่าง ๆ ของเว็บ (หน้าแรก -> ตาราง -> แบ่งสาย ฯลฯ) ในการเข้าชม
+     ครั้งเดียวกัน ไม่ต้องรอโหลดข้อมูลจาก Apps Script ใหม่ทุกครั้ง (ซึ่งมักจะช้าเพราะ
+     ตัว Apps Script เองมีเวลาเริ่มทำงาน/cold start) โหลดครั้งแรกยังคงรอตามปกติ
+     แต่หน้าถัดไปในทริปเดียวกันจะเร็วขึ้นมาก แคชนี้หมดอายุเองใน 30 วินาที และจะถูก
+     ล้างทิ้งทันทีเมื่อเข้าสู่ระบบแอดมิน เพื่อไม่ให้เห็นข้อมูลเก่าตอนกำลังจะแก้ไข */
+  const CLIENT_CACHE_KEY = "bansang_getall_cache_v1";
+  const CLIENT_CACHE_TTL_MS = 30000;
+
+  function readClientCache() {
+    try {
+      const raw = sessionStorage.getItem(CLIENT_CACHE_KEY);
+      if (!raw) return null;
+      const parsed = JSON.parse(raw);
+      if (Date.now() - parsed.ts > CLIENT_CACHE_TTL_MS) return null;
+      return parsed.data;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function writeClientCache(data) {
+    try {
+      sessionStorage.setItem(CLIENT_CACHE_KEY, JSON.stringify({ ts: Date.now(), data }));
+    } catch (e) {
+      // sessionStorage อาจใช้ไม่ได้ในบางเบราว์เซอร์/โหมดส่วนตัว ข้ามไปเฉย ๆ ไม่กระทบการทำงานหลัก
+    }
+  }
+
+  function clearClientCache() {
+    try {
+      sessionStorage.removeItem(CLIENT_CACHE_KEY);
+    } catch (e) {}
+  }
+
   /* ดึงข้อมูลหลักทั้ง 4 อย่างในคำขอเดียว (เร็วกว่ายิงทีละอย่างมาก) ใช้ในทุกหน้า
      แทน Promise.all(getSettings(), getTeams(), ...) เดิม — ถ้าโหมด bulk ใช้ไม่ได้
      (เช่น ยังไม่ได้ตั้งค่าแอดมิน หรือ Apps Script ล่ม) จะร่วงกลับไปดึงทีละอย่างเหมือนเดิม
      ซึ่งแต่ละอย่างก็มีระบบสำรอง (gviz แล้วก็ข้อมูลตัวอย่าง) อยู่แล้วในตัว */
   async function getAll() {
+    const cached = readClientCache();
+    if (cached) return cached;
+
+    let result;
     try {
       const bulk = await fetchBulk();
       if (bulk) {
-        return {
+        result = {
           settings: { ...SAMPLE_DATA.settings, ...bulk.settings },
           teams: bulk.teams || [],
           matches: bulk.matches || [],
@@ -163,14 +202,28 @@ const FutsalData = (() => {
     } catch (e) {
       // ตกไปดึงทีละอย่างด้านล่าง
     }
-    const [settings, teams, matches, news] = await Promise.all([
-      getSettings(),
-      getTeams(),
-      getMatches(),
-      getNews(),
-    ]);
-    return { settings, teams, matches, news };
+
+    if (!result) {
+      const [settings, teams, matches, news] = await Promise.all([
+        getSettings(),
+        getTeams(),
+        getMatches(),
+        getNews(),
+      ]);
+      result = { settings, teams, matches, news };
+    }
+
+    writeClientCache(result);
+    return result;
   }
 
-  return { getSettings, getTeams, getMatches, getNews, getRegistrations, getAll };
+  return {
+    getSettings,
+    getTeams,
+    getMatches,
+    getNews,
+    getRegistrations,
+    getAll,
+    clearCache: clearClientCache,
+  };
 })();

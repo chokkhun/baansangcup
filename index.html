@@ -194,14 +194,14 @@
 
     function newsCardHtml(n) {
       return `
-        <article class="news-card">
+        <a class="news-card" href="news-detail.html?id=${encodeURIComponent(n.id)}">
           ${newsImageHtml(n)}
           <div class="news-card__body">
             <div class="news-card__date">${formatThaiDate(n.date)}</div>
             <h3 class="news-card__title">${n.title}</h3>
             <p class="news-card__excerpt">${nl2br(n.excerpt || "")}</p>
           </div>
-        </article>`;
+        </a>`;
     }
 
     // ตารางคะแนนตัวอย่างหน้าแรก (สายแรกของแต่ละรุ่น)

@@ -323,9 +323,12 @@ h1, h2, h3, h4 {
 .match-card__meta { display: flex; gap: 14px; margin-top: 12px; font-size: 12px; color: var(--ink-500); flex-wrap: wrap; }
 
 .news-card {
+  display: block;
   background: var(--navy-800); border: 1px solid var(--line); border-radius: var(--radius);
   overflow: hidden; box-shadow: var(--shadow);
+  transition: transform 0.15s ease, border-color 0.15s ease;
 }
+.news-card:hover { transform: translateY(-3px); border-color: var(--gold-400); }
 .news-card__img {
   height: 150px;
   background: linear-gradient(135deg, var(--blue-500), var(--red-500));

@@ -33,6 +33,7 @@ function initLogin() {
     try {
       // เรียก action เบาๆ เพื่อทดสอบรหัสผ่าน
       await AdminAPI.updateSettings({});
+      FutsalData.clearCache(); // กันข้อมูลเก่าค้างจากตอนเปิดหน้าเว็บสาธารณะก่อนหน้านี้
       loginScreen.style.display = "none";
       adminPanel.style.display = "block";
       loadAllData();
