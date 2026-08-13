@@ -18,6 +18,7 @@ const SHEET_TABS = {
   teams: "Teams",
   matches: "Matches",
   news: "News",
+  registrations: "Registrations",
 };
 
 /* =========================================================

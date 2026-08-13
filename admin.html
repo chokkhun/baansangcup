@@ -51,6 +51,7 @@
 
     <div class="division-tabs" id="admin-tabs">
       <button data-tab="matches" class="is-active">ผล/ตารางแข่ง</button>
+      <button data-tab="registrations">ทีมสมัคร</button>
       <button data-tab="settings">ตั้งค่าเว็บ</button>
       <button data-tab="teams">ทีม</button>
       <button data-tab="news">ข่าวสาร</button>
@@ -65,6 +66,15 @@
         <form id="match-add-form" class="admin-form-grid"></form>
       </div>
       <div id="matches-list"></div>
+    </div>
+
+    <!-- ===== ทีมสมัครเข้าร่วม ===== -->
+    <div class="admin-tab-panel" data-panel="registrations" style="display:none">
+      <p style="color:var(--ink-500);font-size:13px;margin-bottom:16px">
+        รายชื่อทีมที่กรอกแบบฟอร์มสมัครจากหน้าเว็บ (<a href="register.html" style="color:var(--gold-400)">ลิงก์หน้าสมัคร</a>)
+        ตรวจสอบแล้วกด "อนุมัติ" หรือลบรายการที่ไม่ต้องการได้
+      </p>
+      <div id="registrations-list"></div>
     </div>
 
     <!-- ===== ตั้งค่าเว็บ ===== -->

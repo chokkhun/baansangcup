@@ -4,7 +4,7 @@
    จะพยายามดึงข้อมูลใหม่จากเน็ตเสมอ เพื่อให้ผล/ตารางแข่งอัปเดตล่าสุด)
    ========================================================= */
 
-const CACHE_VERSION = "bansang-cup-v1"; // เปลี่ยนเลขนี้เมื่อแก้ไฟล์เว็บ เพื่อล้างแคชเก่า
+const CACHE_VERSION = "bansang-cup-v2"; // เปลี่ยนเลขนี้เมื่อแก้ไฟล์เว็บ เพื่อล้างแคชเก่า
 
 const APP_SHELL = [
   "./",
@@ -13,6 +13,7 @@ const APP_SHELL = [
   "./draw.html",
   "./rules.html",
   "./news.html",
+  "./register.html",
   "./assets/css/style.css",
   "./assets/js/config.js",
   "./assets/js/sheets.js",

@@ -30,6 +30,7 @@
       <a href="draw.html">จับฉลากแบ่งสาย</a>
       <a href="rules.html">กฎกติกา</a>
       <a href="news.html" aria-current="page">ข่าวสาร</a>
+      <a href="register.html">สมัครทีม</a>
     </nav>
   </div>
 </header>
@@ -62,6 +63,7 @@
         <li><a href="draw.html">จับฉลากแบ่งสาย</a></li>
         <li><a href="rules.html">กฎกติกา</a></li>
         <li><a href="news.html">ข่าวสาร</a></li>
+        <li><a href="register.html">สมัครทีม</a></li>
       </ul>
     </div>
     <div>
@@ -82,6 +84,7 @@
       <a href="draw.html"><span class="icon">🎯</span>แบ่งสาย</a>
       <a href="rules.html"><span class="icon">📋</span>กติกา</a>
       <a href="news.html" aria-current="page"><span class="icon">📰</span>ข่าว</a>
+      <a href="register.html"><span class="icon">📝</span>สมัคร</a>
   </div>
 </nav>
 
@@ -90,7 +93,7 @@
 <script src="assets/js/app.js"></script>
 <script>
   (async function () {
-    const [settings, news] = await Promise.all([FutsalData.getSettings(), FutsalData.getNews()]);
+    const { settings, news } = await FutsalData.getAll();
     applySettings(settings);
 
     document.getElementById("news-grid").innerHTML = news.map((n) => `

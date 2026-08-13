@@ -6,6 +6,7 @@ let TEAMS_CACHE = [];
 let MATCHES_CACHE = [];
 let NEWS_CACHE = [];
 let SETTINGS_CACHE = {};
+let REGISTRATIONS_CACHE = [];
 
 function showStatus(msg, type) {
   const el = document.getElementById("admin-status");
@@ -74,16 +75,20 @@ function initTabs() {
 
 /* ---------- โหลดข้อมูลทั้งหมด ---------- */
 async function loadAllData() {
-  [SETTINGS_CACHE, TEAMS_CACHE, MATCHES_CACHE, NEWS_CACHE] = await Promise.all([
-    FutsalData.getSettings(),
-    FutsalData.getTeams(),
-    FutsalData.getMatches(),
-    FutsalData.getNews(),
+  const [all, registrations] = await Promise.all([
+    FutsalData.getAll(),
+    FutsalData.getRegistrations(),
   ]);
+  SETTINGS_CACHE = all.settings;
+  TEAMS_CACHE = all.teams;
+  MATCHES_CACHE = all.matches;
+  NEWS_CACHE = all.news;
+  REGISTRATIONS_CACHE = registrations;
   renderSettings();
   renderMatches();
   renderTeams();
   renderNews();
+  renderRegistrations();
   renderAddMatchForm();
   renderAddTeamForm();
   renderAddNewsForm();
@@ -447,6 +452,81 @@ function renderNews() {
         showStatus(`ลบข่าว #${id} เรียบร้อยแล้ว`, "ok");
         NEWS_CACHE = await FutsalData.getNews();
         renderNews();
+      } catch (err) {
+        showStatus("ลบไม่สำเร็จ: " + err.message, "error");
+      }
+    });
+  });
+}
+
+/* ---------- ทีมสมัครเข้าร่วม ---------- */
+const REG_STATUS_OPTIONS = ["รอตรวจสอบ", "อนุมัติแล้ว", "ปฏิเสธ"];
+
+function renderRegistrations() {
+  const container = document.getElementById("registrations-list");
+  if (!container) return;
+  const sorted = [...REGISTRATIONS_CACHE].sort((a, b) =>
+    String(b.timestamp || "").localeCompare(String(a.timestamp || ""))
+  );
+  container.innerHTML =
+    sorted
+      .map((r) => {
+        const rowId = `reg-${r.id}`;
+        return `
+      <div class="admin-row" data-id="${r.id}">
+        <div class="admin-row__top">
+          <span class="admin-row__title">#${r.id} · ${r.team_name || "-"} (${r.division || "-"})</span>
+          <div class="field-actions">
+            <button class="btn btn-primary btn-sm" data-action="save">บันทึก</button>
+            <button class="btn btn-danger btn-sm" data-action="delete">ลบ</button>
+          </div>
+        </div>
+        <div class="admin-form-grid" id="${rowId}">
+          <div class="field"><label>สมัครเมื่อ</label><input value="${escapeAttr(r.timestamp || "")}" disabled /></div>
+          <div class="field"><label for="${rowId}-division">รุ่นอายุ</label>
+            <select id="${rowId}-division" data-key="division">
+              ${["U12", "U14"].map((o) => `<option value="${o}" ${o === r.division ? "selected" : ""}>${o}</option>`).join("")}
+            </select></div>
+          <div class="field"><label for="${rowId}-team_name">ชื่อทีม</label>
+            <input id="${rowId}-team_name" data-key="team_name" value="${escapeAttr(r.team_name || "")}" /></div>
+          <div class="field"><label for="${rowId}-contact_name">ชื่อผู้ติดต่อ</label>
+            <input id="${rowId}-contact_name" data-key="contact_name" value="${escapeAttr(r.contact_name || "")}" /></div>
+          <div class="field"><label for="${rowId}-phone">เบอร์โทร</label>
+            <input id="${rowId}-phone" data-key="phone" value="${escapeAttr(r.phone || "")}" /></div>
+          <div class="field"><label for="${rowId}-players_count">จำนวนผู้เล่น</label>
+            <input id="${rowId}-players_count" data-key="players_count" value="${escapeAttr(r.players_count || "")}" /></div>
+          <div class="field field-wide"><label for="${rowId}-note">หมายเหตุ</label>
+            <input id="${rowId}-note" data-key="note" value="${escapeAttr(r.note || "")}" /></div>
+          <div class="field"><label for="${rowId}-status">สถานะ</label>
+            <select id="${rowId}-status" data-key="status">
+              ${REG_STATUS_OPTIONS.map((o) => `<option value="${o}" ${o === r.status ? "selected" : ""}>${o}</option>`).join("")}
+            </select></div>
+        </div>
+      </div>`;
+      })
+      .join("") || `<p style="color:var(--ink-500)">ยังไม่มีทีมสมัครเข้ามา</p>`;
+
+  container.querySelectorAll(".admin-row").forEach((row) => {
+    const id = row.dataset.id;
+    const keys = ["division", "team_name", "contact_name", "phone", "players_count", "note", "status"];
+    row.querySelector('[data-action="save"]').addEventListener("click", async () => {
+      const data = { id };
+      keys.forEach((key) => (data[key] = row.querySelector(`[data-key="${key}"]`).value));
+      try {
+        await AdminAPI.upsertRegistration(data);
+        showStatus(`บันทึกทีมสมัคร #${id} เรียบร้อยแล้ว`, "ok");
+        REGISTRATIONS_CACHE = await FutsalData.getRegistrations();
+      } catch (err) {
+        showStatus("บันทึกไม่สำเร็จ: " + err.message, "error");
+      }
+    });
+    row.querySelector('[data-action="delete"]').addEventListener("click", async () => {
+      if (!confirm(`ลบทีมสมัคร #${id} ใช่หรือไม่?`)) return;
+      try {
+        await AdminAPI.deleteRegistration(id);
+        showStatus(`ลบทีมสมัคร #${id} เรียบร้อยแล้ว`, "ok");
+        REGISTRATIONS_CACHE = await FutsalData.getRegistrations();
+        renderRegistrations();
       } catch (err) {
         showStatus("ลบไม่สำเร็จ: " + err.message, "error");
       }
