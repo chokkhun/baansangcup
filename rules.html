@@ -73,34 +73,7 @@
       </div>
     </div>
 
-    <div class="rules-block">
-      <h3>รูปแบบการแข่งขัน</h3>
-      <ul>
-        <li>แข่งขันครึ่งละ <b data-setting="half_minutes">15</b> นาที ไม่มีต่อเวลา</li>
-        <li>รอบแบ่งสาย แข่งขันแบบพบกันหมดภายในสาย เก็บคะแนนสะสม (ชนะ 3 คะแนน เสมอ 1 คะแนน แพ้ 0 คะแนน)</li>
-        <li>ทีมอันดับต้นของแต่ละสายผ่านเข้าสู่รอบแพ้คัดออก (Knockout)</li>
-        <li>หากคะแนนเท่ากันในรอบแพ้คัดออก ตัดสินด้วยการยิงลูกโทษ ณ จุดโทษ</li>
-        <li>กติกาการแข่งขันอื่น ๆ ให้ยึดตามกติกาฟุตซอลสากล (FIFA Futsal Laws of the Game) เป็นหลัก</li>
-      </ul>
-    </div>
-
-    <div class="rules-block">
-      <h3>คุณสมบัติผู้เล่น</h3>
-      <ul>
-        <li>ผู้เล่นต้องมีอายุตรงตามรุ่นที่สมัคร โดยยึดปีเกิดตามที่ระบุในแต่ละรุ่น</li>
-        <li>ทีมต้องเตรียมเอกสารยืนยันอายุ/สำเนาบัตรประชาชนหรือสูติบัตรของผู้เล่นมาแสดงในวันแข่งขัน</li>
-        <li>1 ทีมสามารถมีผู้เล่นได้ไม่เกินตามที่ผู้จัดกำหนดในวันประชุมผู้จัดการทีม</li>
-      </ul>
-    </div>
-
-    <div class="rules-block">
-      <h3>การรับสมัครและการชำระเงิน</h3>
-      <ul>
-        <li>ชำระค่าสมัครและค่าประกันทีมพร้อมกันในวันที่สมัคร เพื่อยืนยันสิทธิ์การเข้าร่วม</li>
-        <li>ค่าประกันทีมจะได้รับคืนเมื่อทีมไม่มีปัญหาเรื่องวินัย/มารยาทตลอดการแข่งขัน</li>
-        <li>ที่นั่งมีจำนวนจำกัดตามจำนวนทีมที่รับในแต่ละรุ่น สมัครก่อนมีสิทธิ์ก่อน</li>
-      </ul>
-    </div>
+    <div id="rules-dynamic"></div>
 
   </div>
 </main>
@@ -148,8 +121,13 @@
 <script src="assets/js/app.js"></script>
 <script>
   (async function () {
-    const settings = await FutsalData.getSettings();
+    const { settings, rules } = await FutsalData.getAll();
     applySettings(settings);
+
+    const container = document.getElementById("rules-dynamic");
+    container.innerHTML = (rules && rules.length)
+      ? rules.map((r) => ruleBlockHtml(r, settings)).join("")
+      : "";
   })();
 </script>
 </body>

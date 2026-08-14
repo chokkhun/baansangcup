@@ -7,6 +7,7 @@ let MATCHES_CACHE = [];
 let NEWS_CACHE = [];
 let SETTINGS_CACHE = {};
 let REGISTRATIONS_CACHE = [];
+let RULES_CACHE = [];
 
 function showStatus(msg, type) {
   const el = document.getElementById("admin-status");
@@ -84,15 +85,18 @@ async function loadAllData() {
   TEAMS_CACHE = all.teams;
   MATCHES_CACHE = all.matches;
   NEWS_CACHE = all.news;
+  RULES_CACHE = all.rules || [];
   REGISTRATIONS_CACHE = registrations;
   renderSettings();
   renderMatches();
   renderTeams();
   renderNews();
   renderRegistrations();
+  renderRules();
   renderAddMatchForm();
   renderAddTeamForm();
   renderAddNewsForm();
+  renderAddRuleForm();
 }
 
 /* ---------- ตั้งค่าเว็บ (Settings) ---------- */
@@ -453,6 +457,98 @@ function renderNews() {
         showStatus(`ลบข่าว #${id} เรียบร้อยแล้ว`, "ok");
         NEWS_CACHE = await FutsalData.getNews();
         renderNews();
+      } catch (err) {
+        showStatus("ลบไม่สำเร็จ: " + err.message, "error");
+      }
+    });
+  });
+}
+
+/* ---------- กฎกติกา ---------- */
+const RULE_FIELDS = [
+  ["order", "ลำดับ (เลขน้อยขึ้นก่อน)", "text"],
+  ["title", "หัวข้อ", "text"],
+  ["content", "เนื้อหา (ขึ้นบรรทัดใหม่ได้ / นำหน้าด้วย • เพื่อแสดงเป็นลิสต์)", "textarea"],
+];
+
+function ruleFieldHtml(field, value, idPrefix) {
+  const [key, label, type] = field;
+  const id = `${idPrefix}-${key}`;
+  if (type === "textarea") {
+    return `<div class="field field-wide"><label for="${id}">${label}</label>
+      <textarea id="${id}" data-key="${key}" rows="5">${value ?? ""}</textarea></div>`;
+  }
+  return `<div class="field"><label for="${id}">${label}</label>
+    <input id="${id}" data-key="${key}" value="${escapeAttr(value ?? "")}" /></div>`;
+}
+
+function renderAddRuleForm() {
+  const form = document.getElementById("rule-add-form");
+  form.innerHTML =
+    RULE_FIELDS.map((f) => ruleFieldHtml(f, "", "new-rule")).join("") +
+    `<div class="field field-actions"><button type="submit" class="btn btn-primary">เพิ่มหัวข้อ</button></div>`;
+  form.onsubmit = async (e) => {
+    e.preventDefault();
+    const data = {};
+    RULE_FIELDS.forEach(([key]) => (data[key] = form.querySelector(`[data-key="${key}"]`).value));
+    try {
+      await AdminAPI.upsertRule(data);
+      showStatus("เพิ่มหัวข้อกฎกติกาเรียบร้อยแล้ว", "ok");
+      RULES_CACHE = await FutsalData.getRules();
+      renderRules();
+      form.reset();
+    } catch (err) {
+      showStatus("เพิ่มไม่สำเร็จ: " + err.message, "error");
+    }
+  };
+}
+
+function renderRules() {
+  const container = document.getElementById("rules-list");
+  if (!container) return;
+  const sorted = [...RULES_CACHE].sort(
+    (a, b) => (parseInt(a.order, 10) || 0) - (parseInt(b.order, 10) || 0)
+  );
+  container.innerHTML =
+    sorted
+      .map((r) => {
+        const rowId = `rule-${r.id}`;
+        return `
+      <div class="admin-row" data-id="${r.id}">
+        <div class="admin-row__top">
+          <span class="admin-row__title">#${r.id} · ${r.title || "-"}</span>
+          <div class="field-actions">
+            <button class="btn btn-primary btn-sm" data-action="save">บันทึก</button>
+            <button class="btn btn-danger btn-sm" data-action="delete">ลบ</button>
+          </div>
+        </div>
+        <div class="admin-form-grid" id="${rowId}">
+          ${RULE_FIELDS.map((f) => ruleFieldHtml(f, r[f[0]], rowId)).join("")}
+        </div>
+      </div>`;
+      })
+      .join("") || `<p style="color:var(--ink-500)">ยังไม่มีหัวข้อกฎกติกา</p>`;
+
+  container.querySelectorAll(".admin-row").forEach((row) => {
+    const id = row.dataset.id;
+    row.querySelector('[data-action="save"]').addEventListener("click", async () => {
+      const data = { id };
+      RULE_FIELDS.forEach(([key]) => (data[key] = row.querySelector(`[data-key="${key}"]`).value));
+      try {
+        await AdminAPI.upsertRule(data);
+        showStatus(`บันทึกหัวข้อ #${id} เรียบร้อยแล้ว`, "ok");
+        RULES_CACHE = await FutsalData.getRules();
+      } catch (err) {
+        showStatus("บันทึกไม่สำเร็จ: " + err.message, "error");
+      }
+    });
+    row.querySelector('[data-action="delete"]').addEventListener("click", async () => {
+      if (!confirm(`ลบหัวข้อ #${id} ใช่หรือไม่?`)) return;
+      try {
+        await AdminAPI.deleteRule(id);
+        showStatus(`ลบหัวข้อ #${id} เรียบร้อยแล้ว`, "ok");
+        RULES_CACHE = await FutsalData.getRules();
+        renderRules();
       } catch (err) {
         showStatus("ลบไม่สำเร็จ: " + err.message, "error");
       }

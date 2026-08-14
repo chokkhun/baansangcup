@@ -145,6 +145,16 @@ const FutsalData = (() => {
     }
   }
 
+  /* เนื้อหาหน้ากฎกติกา (ส่วนที่แก้ไขได้จากหน้าแอดมิน) */
+  async function getRules() {
+    try {
+      const rows = await fetchSheet(SHEET_TABS.rules);
+      return rows.sort((a, b) => (parseInt(a.order, 10) || 0) - (parseInt(b.order, 10) || 0));
+    } catch (e) {
+      return SAMPLE_DATA.rules;
+    }
+  }
+
   /* แคชผลลัพธ์ของ getAll() ไว้ในเบราว์เซอร์ชั่วคราว (sessionStorage) เพื่อให้การ
      สลับไปมาระหว่างหน้าต่าง ๆ ของเว็บ (หน้าแรก -> ตาราง -> แบ่งสาย ฯลฯ) ในการเข้าชม
      ครั้งเดียวกัน ไม่ต้องรอโหลดข้อมูลจาก Apps Script ใหม่ทุกครั้ง (ซึ่งมักจะช้าเพราะ
@@ -197,6 +207,9 @@ const FutsalData = (() => {
           teams: bulk.teams || [],
           matches: bulk.matches || [],
           news: (bulk.news || []).sort((a, b) => (a.date < b.date ? 1 : -1)),
+          rules: (bulk.rules || []).sort(
+            (a, b) => (parseInt(a.order, 10) || 0) - (parseInt(b.order, 10) || 0)
+          ),
         };
       }
     } catch (e) {
@@ -204,13 +217,14 @@ const FutsalData = (() => {
     }
 
     if (!result) {
-      const [settings, teams, matches, news] = await Promise.all([
+      const [settings, teams, matches, news, rules] = await Promise.all([
         getSettings(),
         getTeams(),
         getMatches(),
         getNews(),
+        getRules(),
       ]);
-      result = { settings, teams, matches, news };
+      result = { settings, teams, matches, news, rules };
     }
 
     writeClientCache(result);
@@ -223,6 +237,7 @@ const FutsalData = (() => {
     getMatches,
     getNews,
     getRegistrations,
+    getRules,
     getAll,
     clearCache: clearClientCache,
   };

@@ -45,6 +45,8 @@ const AdminAPI = (() => {
     deleteNews: (id) => call("deleteNews", { id }),
     upsertRegistration: (data) => call("upsertRegistration", { data }),
     deleteRegistration: (id) => call("deleteRegistration", { id }),
+    upsertRule: (data) => call("upsertRule", { data }),
+    deleteRule: (id) => call("deleteRule", { id }),
     // การสมัครทีมจากหน้าเว็บสาธารณะ ไม่ต้องล็อกอิน จึงไม่ผ่าน getPassword()
     submitRegistration: (data) => call("publicRegister", { data }),
     uploadImage: (base64, filename, mimeType) =>

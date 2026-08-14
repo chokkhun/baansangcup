@@ -52,6 +52,7 @@
     <div class="division-tabs" id="admin-tabs">
       <button data-tab="matches" class="is-active">ผล/ตารางแข่ง</button>
       <button data-tab="registrations">ทีมสมัคร</button>
+      <button data-tab="rules">กฎกติกา</button>
       <button data-tab="settings">ตั้งค่าเว็บ</button>
       <button data-tab="teams">ทีม</button>
       <button data-tab="news">ข่าวสาร</button>
@@ -75,6 +76,21 @@
         ตรวจสอบแล้วกด "อนุมัติ" หรือลบรายการที่ไม่ต้องการได้
       </p>
       <div id="registrations-list"></div>
+    </div>
+
+    <!-- ===== กฎกติกา ===== -->
+    <div class="admin-tab-panel" data-panel="rules" style="display:none">
+      <p style="color:var(--ink-500);font-size:13px;margin-bottom:16px">
+        แต่ละหัวข้อจะแสดงในหน้า "กฎกติกา" ของเว็บตามลำดับเลข "ลำดับ" (น้อยไปมาก) —
+        ถ้าพิมพ์เนื้อหาโดยขึ้นบรรทัดใหม่แล้วนำหน้าทุกบรรทัดด้วยเครื่องหมาย • จะแสดงผล
+        เป็นลิสต์หัวข้อย่อยอัตโนมัติ พิมพ์ <code>{{half_minutes}}</code> เพื่อดึงตัวเลขจากแท็บ
+        ตั้งค่าเว็บมาแสดงอัตโนมัติได้
+      </p>
+      <div class="admin-card" style="margin-bottom:20px">
+        <h3>เพิ่มหัวข้อกฎกติกาใหม่</h3>
+        <form id="rule-add-form" class="admin-form-grid"></form>
+      </div>
+      <div id="rules-list"></div>
     </div>
 
     <!-- ===== ตั้งค่าเว็บ ===== -->

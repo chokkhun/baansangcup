@@ -56,6 +56,25 @@ function newsImageHtml(n) {
   return `<div class="news-card__img" style="background-image:url('${n.image_url}');background-size:cover;background-position:center"></div>`;
 }
 
+/* แทนที่ {{settingKey}} ในข้อความด้วยค่าจริงจาก Settings เช่น {{half_minutes}}
+   ทำให้เนื้อหากฎกติกาซิงก์กับตัวเลขที่ตั้งค่าไว้จุดเดียวได้ */
+function applySettingsTemplate(text, settings) {
+  return String(text || "").replace(/\{\{(\w+)\}\}/g, (match, key) =>
+    settings && settings[key] !== undefined ? settings[key] : match
+  );
+}
+
+/* การ์ดหัวข้อกฎกติกา — ถ้าทุกบรรทัดขึ้นต้นด้วย "•" จะแสดงเป็นลิสต์ ไม่งั้นแสดงเป็นย่อหน้าปกติ */
+function ruleBlockHtml(r, settings) {
+  const text = applySettingsTemplate(r.content, settings);
+  const lines = text.split(/\r\n|\r|\n/).filter((l) => l.trim() !== "");
+  const isList = lines.length > 0 && lines.every((l) => l.trim().startsWith("•"));
+  const body = isList
+    ? `<ul>${lines.map((l) => `<li>${escapeHtml(l.trim().replace(/^•\s*/, ""))}</li>`).join("")}</ul>`
+    : `<p>${nl2br(text)}</p>`;
+  return `<div class="rules-block"><h3>${escapeHtml(r.title || "")}</h3>${body}</div>`;
+}
+
 /* ---------- ป้ายสถานะแมตช์ ---------- */
 function statusBadge(status) {
   if (status === "live") return `<span class="badge badge-live">กำลังแข่ง</span>`;
