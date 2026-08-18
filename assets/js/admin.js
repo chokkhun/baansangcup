@@ -132,8 +132,8 @@ const MATCH_FIELDS = [
   ["division", "รุ่นอายุ", "select", ["U12", "U14"]],
   ["group", "สาย", "text"],
   ["round", "รอบ", "text"],
-  ["date", "วันที่ (2569-11-06)", "text"],
-  ["time", "เวลา", "text"],
+  ["date", "วันที่แข่งขัน", "date"],
+  ["time", "เวลา", "time"],
   ["venue", "สนาม", "text"],
   ["team_home", "ทีมเหย้า", "text"],
   ["team_away", "ทีมเยือน", "text"],
@@ -155,8 +155,12 @@ function fieldHtml(field, value, idPrefix) {
         ${options.map((o) => `<option value="${o}" ${o === value ? "selected" : ""}>${o}</option>`).join("")}
       </select></div>`;
   }
+  // date/time ใช้ตัวเลือกวันที่-เวลาแบบเนทีฟของเบราว์เซอร์ กันปัญหาเรื่องเรียงลำดับ
+  // วัน/เดือน/ปี สับสนเวลาพิมพ์เอง ค่าที่ได้จะยังคงเป็นรูปแบบ YYYY-MM-DD/HH:mm เหมือนเดิม
+  // (ไม่กระทบการเรียงลำดับตามวันที่ที่อื่นในระบบ)
+  const inputType = type === "date" || type === "time" ? type : "text";
   return `<div class="field"><label for="${id}">${label}</label>
-    <input id="${id}" data-key="${key}" value="${escapeAttr(value ?? "")}" /></div>`;
+    <input type="${inputType}" id="${id}" data-key="${key}" value="${escapeAttr(value ?? "")}" /></div>`;
 }
 
 function renderAddMatchForm() {
@@ -307,7 +311,7 @@ function renderTeams() {
 
 /* ---------- ข่าวสาร ---------- */
 const NEWS_FIELDS = [
-  ["date", "วันที่ (2569-11-06)", "text"],
+  ["date", "วันที่เผยแพร่", "date"],
   ["title", "หัวข้อข่าว", "text"],
   ["excerpt", "สรุปย่อ", "text"],
   ["content", "เนื้อหาเต็ม", "textarea"],
@@ -360,8 +364,9 @@ function newsFieldHtml(field, value, idPrefix) {
       ${value ? `<img src="${escapeAttr(value)}" class="admin-image-preview" id="${id}-preview" />` : `<img class="admin-image-preview" id="${id}-preview" style="display:none" />`}
     </div>`;
   }
+  const inputType = type === "date" ? "date" : "text";
   return `<div class="field"><label for="${id}">${label}</label>
-    <input id="${id}" data-key="${key}" value="${escapeAttr(value ?? "")}" /></div>`;
+    <input type="${inputType}" id="${id}" data-key="${key}" value="${escapeAttr(value ?? "")}" /></div>`;
 }
 
 /* ผูก event ให้ input[type=file] ของรูปข่าว: เลือกไฟล์ -> ย่อขนาด -> อัปโหลดขึ้น Drive -> เติมลิงก์ */
