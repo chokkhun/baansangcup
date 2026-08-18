@@ -13,7 +13,9 @@ function formatThaiDate(isoLike) {
   if (parts.length < 3) return isoLike;
   const [y, m, d] = parts;
   const month = THAI_MONTHS[parseInt(m, 10) - 1] || m;
-  return `${parseInt(d, 10)} ${month} ${y}`;
+  // แปลงปี ค.ศ. (ที่เก็บในชีตจากปฏิทินของเบราว์เซอร์) เป็น พ.ศ. สำหรับแสดงผล
+  const buddhistYear = parseInt(y, 10) + 543;
+  return `${parseInt(d, 10)} ${month} ${buddhistYear}`;
 }
 
 function divisionLabel(div) {

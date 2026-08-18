@@ -103,18 +103,18 @@ const SAMPLE_DATA = {
   ],
 
   matches: [
-    { id: 1, division: "U12", group: "A", round: "รอบแบ่งกลุ่ม", date: "2569-11-06", time: "09:00", venue: "สนาม 1", team_home: "ทีม A1", team_away: "ทีม A2", score_home: "", score_away: "", status: "upcoming" },
-    { id: 2, division: "U12", group: "A", round: "รอบแบ่งกลุ่ม", date: "2569-11-06", time: "09:30", venue: "สนาม 2", team_home: "ทีม A3", team_away: "ทีม B1", score_home: "", score_away: "", status: "upcoming" },
-    { id: 3, division: "U14", group: "B", round: "รอบแบ่งกลุ่ม", date: "2569-11-06", time: "10:00", venue: "สนาม 1", team_home: "ทีม B2", team_away: "ทีม B3", score_home: "", score_away: "", status: "upcoming" },
-    { id: 4, division: "U12", group: "C", round: "รอบแบ่งกลุ่ม", date: "2569-11-06", time: "08:30", venue: "สนาม 2", team_home: "ทีม C1", team_away: "ทีม C2", score_home: "3", score_away: "1", status: "finished" },
-    { id: 5, division: "U14", group: "A", round: "รอบแบ่งกลุ่ม", date: "2569-11-06", time: "08:00", venue: "สนาม 1", team_home: "ทีม A1", team_away: "ทีม A4", score_home: "2", score_away: "2", status: "finished" },
-    { id: 6, division: "U14", group: "D", round: "รอบแบ่งกลุ่ม", date: "2569-11-07", time: "09:00", venue: "สนาม 2", team_home: "ทีม D1", team_away: "ทีม D2", score_home: "", score_away: "", status: "upcoming" },
+    { id: 1, division: "U12", group: "A", round: "รอบแบ่งกลุ่ม", date: "2026-11-06", time: "09:00", venue: "สนาม 1", team_home: "ทีม A1", team_away: "ทีม A2", score_home: "", score_away: "", status: "upcoming" },
+    { id: 2, division: "U12", group: "A", round: "รอบแบ่งกลุ่ม", date: "2026-11-06", time: "09:30", venue: "สนาม 2", team_home: "ทีม A3", team_away: "ทีม B1", score_home: "", score_away: "", status: "upcoming" },
+    { id: 3, division: "U14", group: "B", round: "รอบแบ่งกลุ่ม", date: "2026-11-06", time: "10:00", venue: "สนาม 1", team_home: "ทีม B2", team_away: "ทีม B3", score_home: "", score_away: "", status: "upcoming" },
+    { id: 4, division: "U12", group: "C", round: "รอบแบ่งกลุ่ม", date: "2026-11-06", time: "08:30", venue: "สนาม 2", team_home: "ทีม C1", team_away: "ทีม C2", score_home: "3", score_away: "1", status: "finished" },
+    { id: 5, division: "U14", group: "A", round: "รอบแบ่งกลุ่ม", date: "2026-11-06", time: "08:00", venue: "สนาม 1", team_home: "ทีม A1", team_away: "ทีม A4", score_home: "2", score_away: "2", status: "finished" },
+    { id: 6, division: "U14", group: "D", round: "รอบแบ่งกลุ่ม", date: "2026-11-07", time: "09:00", venue: "สนาม 2", team_home: "ทีม D1", team_away: "ทีม D2", score_home: "", score_away: "", status: "upcoming" },
   ],
 
   news: [
     {
       id: 1,
-      date: "2569-10-15",
+      date: "2026-10-15",
       title: "เปิดรับสมัครทีมเข้าร่วม บ้านสร้างคัพ ครั้งที่ 1",
       image_url: "",
       excerpt:
